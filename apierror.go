@@ -3,6 +3,7 @@ package apierror
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 )
 
@@ -24,6 +25,17 @@ func (f MapperFunc) Map(err error) APIError {
 type Rule struct {
 	Target error
 	Mapper Mapper
+}
+
+func (r Rule) Resolve(err error) APIError {
+	if errors.Is(err, r.Target) {
+		return r.Mapper.Map(err)
+	}
+
+	return APIError{
+		StatusCode: http.StatusInternalServerError,
+		Message:    http.StatusText(http.StatusInternalServerError),
+	}
 }
 
 type MapperChain struct {
@@ -56,6 +68,9 @@ var UnmarshalResolver Mapper = MapperFunc(func(err error) APIError {
 	base := APIError{
 		StatusCode: http.StatusBadRequest,
 		Message:    http.StatusText(http.StatusBadRequest),
+	}
+	if errors.Is(err, io.EOF) {
+		base.Message = io.EOF.Error()
 	}
 	if e, ok := errors.AsType[*json.SyntaxError](err); ok {
 		base.Message = e.Error()
