@@ -23,7 +23,7 @@ func NewMapperComposite(rules ...Rule) MapperComponent {
 	return MapperComposite{rules: newRules}
 }
 
-func (mc MapperComposite) With(rules ...Rule) MapperComponent {
+func (mc MapperComposite) With(rules ...Rule) MapperComposite {
 	newRules := make([]Rule, len(mc.rules)+len(rules))
 	copy(newRules[:len(mc.rules)], mc.rules)
 	copy(newRules[len(mc.rules):], rules)
