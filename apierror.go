@@ -12,11 +12,12 @@ type APIError struct {
 type MapperComponent interface {
 	Map(err error) APIError
 }
+
 type MapperComposite struct {
 	rules []Rule
 }
 
-func NewMapperComposite(rules ...Rule) MapperComponent {
+func NewMapperComposite(rules ...Rule) MapperComposite {
 	newRules := make([]Rule, len(rules))
 	copy(newRules, rules)
 
