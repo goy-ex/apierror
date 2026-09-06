@@ -15,10 +15,12 @@ var Mapper apierror.MapperComponent = apierror.MapperFunc(func(err error) apierr
 	}
 
 	if errs, ok := errors.AsType[validator.ValidationErrors](err); ok {
-		sb := strings.Builder{}
-		for _, e := range errs {
-			sb.WriteString("-")
+		var sb strings.Builder
+		for i, e := range errs {
 			sb.WriteString(e.Error())
+			if i != len(errs)-1 {
+				sb.WriteString("; ")
+			}
 		}
 
 		return apierror.APIError{
